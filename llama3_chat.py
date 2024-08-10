@@ -9,8 +9,6 @@ import os
 
 st.subheader("Llama 3.1 405B Chatbot")
 
-st.markdown("Built by [Build Fast with AI](https://www.buildfastwithai.com/genai-course)")
-
 with st.sidebar:
     st.title("Llama 3.1 405B Chatbot")
     st.subheader("This app lets you chat with Llama 3.1 405B! [👉]")
