@@ -4,8 +4,11 @@ from langchain_openai import ChatOpenAI
 from langchain.chains import ConversationChain
 from langchain.chains.conversation.memory import ConversationBufferWindowMemory
 from streamlit_extras.add_vertical_space import add_vertical_space
+from PyPDF2 import PdfReader
+from transformers import pipeline
 
 import os
+summarizer = pipeline("summarization")
 
 st.subheader("Llama 3.1 405B Chatbot")
 
@@ -15,13 +18,12 @@ with st.sidebar:
     api_key = st.text_input("Enter your Fireworks API Key", type="password")
     add_vertical_space(2)
     st.markdown("""
-    Want to lean how to build this? 
+    Want to learn how to build this? 
    
     Join [GenAI Course](https://www.buildfastwithai.com/genai-course) by Build Fast with AI!
     """)
     add_vertical_space(3)
     st.write("Reach out to me on [LinkedIn](https://www.linkedin.com/in/satvik-paramkusham)")
-
 
 # Initialize session state variables
 if 'buffer_memory' not in st.session_state:
@@ -35,6 +37,15 @@ if "messages" not in st.session_state:
 if "conversation" not in st.session_state:
     st.session_state.conversation = None
 
+# Function to extract and summarize PDF
+def extract_and_summarize_pdf(file):
+    reader = PdfReader(file)
+    text = ""
+    for page in reader.pages:
+        text += page.extract_text()
+    summary = summarizer(text, max_length=130, min_length=30, do_sample=False)[0]['summary_text']
+    return summary
+
 # Only initialize ChatOpenAI and ConversationChain if API key is provided
 if api_key:
     if st.session_state.conversation is None:
@@ -47,6 +58,15 @@ if api_key:
             memory=st.session_state.buffer_memory, 
             llm=llm
         )
+
+    # Upload PDF file
+    uploaded_file = st.file_uploader("Choose a PDF file", type="pdf")
+    
+    if uploaded_file is not None:
+        with st.spinner("Extracting and summarizing PDF..."):
+            summary = extract_and_summarize_pdf(uploaded_file)
+            st.write("Summary of PDF:")
+            st.write(summary)
 
     # Rest of your chat interface code
     if prompt := st.chat_input("Your question"):
