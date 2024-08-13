@@ -6,8 +6,9 @@ from langchain.chains.conversation.memory import ConversationBufferWindowMemory
 from streamlit_extras.add_vertical_space import add_vertical_space
 from PyPDF2 import PdfReader
 from transformers import pipeline
+import os  # Retained for potential future use
 
-import os
+# Initialize summarization pipeline
 summarizer = pipeline("summarization")
 
 st.subheader("Llama 3.1 405B Chatbot")
@@ -85,3 +86,4 @@ if api_key:
                 st.session_state.messages.append(message)
 else:
     st.warning("Please enter your Fireworks API Key in the sidebar to start the chat.")
+    
